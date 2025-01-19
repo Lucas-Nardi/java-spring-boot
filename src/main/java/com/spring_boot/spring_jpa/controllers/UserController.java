@@ -29,27 +29,27 @@ public class UserController {
         User user = userMapper.mapFrom(userDto);
         user.setPassword(new BCryptPasswordEncoder(12).encode("123456"));
         User createdUser = userService.createUser(user);
-        return new ResponseEntity<CreatedUserDTO>(new CreatedUserDTO(createdUser.getId()), HttpStatus.CREATED);
+        return ResponseEntity.status(HttpStatus.CREATED).body(new CreatedUserDTO(createdUser.getId()));
     }
 
     @GetMapping(path = "/get-one/{userId}")
     public ResponseEntity<UserDTO> getUser(@PathVariable Long userId) {
         User user = userService.findUserById(userId);
         UserDTO userDTO = userMapper.mapTo(user);
-        return new ResponseEntity<UserDTO>(userDTO, HttpStatus.OK);
+        return ResponseEntity.status(HttpStatus.OK).body(userDTO);
     }
 
     @GetMapping(path = "/get-many")
     public ResponseEntity<List<UserDTO>> getMany() {
         List<User> users = userService.getMany();
         List<UserDTO> userDTO = userMapper.mapTo(users);
-        return new ResponseEntity<List<UserDTO>>(userDTO, HttpStatus.OK);
+        return ResponseEntity.status(HttpStatus.OK).body(userDTO);
     }
 
     @DeleteMapping(path = "/delete/{userId}")
     public ResponseEntity deleteUser(@PathVariable Long userId) {
         userService.deleteUser(userId);
-        return new ResponseEntity<>(HttpStatus.OK);
+        return ResponseEntity.status(HttpStatus.OK).build();
     }
 
 
