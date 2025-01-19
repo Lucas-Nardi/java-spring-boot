@@ -30,10 +30,6 @@ public class SecurityFilter extends OncePerRequestFilter {
         var token = this.recoverToken(request);
         if (token != null) {
             var email = this.jwtService.validateToken(token);
-            System.out.println("email: " +email);
-            if(email.isEmpty()) {
-                throw new RuntimeException("Invalid token");
-            }
             UserDetails user = this.userRepository.findUserByEmail(email);
             var authentication = new UsernamePasswordAuthenticationToken(user.getUsername(), null, user.getAuthorities());
             SecurityContextHolder.getContext().setAuthentication(authentication);
