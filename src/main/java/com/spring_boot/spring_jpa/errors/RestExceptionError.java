@@ -6,6 +6,8 @@ import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+
+import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -33,6 +35,18 @@ public class RestExceptionError {
     @ExceptionHandler(UserErrorException.class)
     public ResponseEntity<ResponseError<String>> userException(UserErrorException ex) {
         ResponseError<String> responseError = new ResponseError<String>(ex.getMessage(), ex.getMessage());
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(responseError);
+    }
+
+    @ExceptionHandler(NullPointerException.class)
+    public ResponseEntity<ResponseError<String>> userException(NullPointerException ex) {
+        ResponseError<String> responseError = new ResponseError<String>(ex.getMessage(), ex.getMessage());
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(responseError);
+    }
+
+    @ExceptionHandler(SQLException.class)
+    public ResponseEntity<ResponseError<String>> userException(SQLException ex) {
+        ResponseError<String> responseError = new ResponseError<String>(ex.getMessage(), "Error while operating database");
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(responseError);
     }
 }
