@@ -5,6 +5,7 @@ import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTCreationException;
 import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.spring_boot.spring_jpa.domain.User;
+import com.spring_boot.spring_jpa.errors.TokenErrorException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -30,7 +31,7 @@ public class JwtService {
                  .sign(algorithm);
          return token;
      }catch(JWTCreationException e){
-        throw new RuntimeException("Error while generate token", e);
+        throw new TokenErrorException("Erro ao gerar o token da aplicação");
      }
     }
 
@@ -44,7 +45,7 @@ public class JwtService {
                     .getSubject();
 
         } catch (JWTVerificationException exception){
-            return "";
+            throw new TokenErrorException("Token inválido");
         }
     }
 
