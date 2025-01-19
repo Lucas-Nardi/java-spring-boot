@@ -6,23 +6,33 @@ import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.ResponseStatus;
-
 import java.util.HashMap;
 import java.util.Map;
 
 @ControllerAdvice
-public class ValidationError {
+public class RestExceptionError {
 
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<Map<String, String>> handleValidationException(MethodArgumentNotValidException ex) {
+    public ResponseEntity<ResponseError<Map<String, String>>> handleValidationException(MethodArgumentNotValidException ex) {
         Map<String, String> errors = new HashMap<>();
         ex.getBindingResult().getAllErrors().forEach(error -> {
             String fieldName = ((FieldError) error).getField();
             String errorMessage = error.getDefaultMessage();
             errors.put(fieldName, errorMessage);
         });
-        return ResponseEntity.badRequest().body(errors);
+        ResponseError<Map<String, String>> responseError = new ResponseError<Map<String, String>>(errors, "Your request has invalid fields");
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(responseError);
+    }
+
+    @ExceptionHandler(TokenErrorException.class)
+    public ResponseEntity<ResponseError<String>> tokenException(TokenErrorException ex) {
+        ResponseError<String> responseError = new ResponseError<String>(ex.getMessage(), "Your token is invalid");
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(responseError);
+    }
+
+    @ExceptionHandler(UserErrorException.class)
+    public ResponseEntity<ResponseError<String>> userException(UserErrorException ex) {
+        ResponseError<String> responseError = new ResponseError<String>(ex.getMessage(), ex.getMessage());
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(responseError);
     }
 }
